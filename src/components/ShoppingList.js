@@ -2,81 +2,33 @@ import React, { useState } from "react";
 import ItemForm from "./ItemForm";
 import Filter from "./Filter";
 import Item from "./Item";
-import { v4 } from "uuid";
+// import { v4 } from "uuid";
 
-function ShoppingList({ items }) {
+function ShoppingList({ items, onItemFormSubmit }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchField, setSearchField] = useState("");
-  const [array, setArray] = useState(items)
-
-  const [itemName, setItemName] = useState("")
-  const [itemCategory, setItemCategory] = useState("Produce");
-
-
-  function handleItemChange(e){
-
-    const value = e.target.value;
-    setItemName(value);
-    
-  }
+  const [search, setSearch] = useState("");
 
   function handleItemCategoryChange(e){
     
-    const category = e.target.value
-    setItemCategory(category)
+    setSelectedCategory(e.target.value)
 
+  }
+
+  function handleSearchChange(e){
+    setSearch(e.target.value)
   }
   
-  function handleFormSubmit(e){
+  const itemsToDisplay = items.filter((item) => selectedCategory === "All"|| item.category === selectedCategory).filter((item) => item.name.toLowerCase().includes(search.toLowerCase()));
 
-    e.preventDefault();
-    
-    const name = e.target.name;
-    let value = e.target.value;
-
-    const newItem = {
-          id: v4(), 
-          name: name,
-          category: value
-        };
-
-    setArray([...array, newItem]);
-
-  }
-
-  function handleSearchField(e){
-    setSearchField(e.target.value)
-  }
-
-  function handleCategoryChange(event) {
-    setSelectedCategory(event.target.value);
-  }
-
-  const itemsToDisplay = array.filter((item) => {
-    if (selectedCategory === "All") return true;
-    
-    return item.category === selectedCategory;
-  });
-
-  const searchItemsToDisplay = itemsToDisplay.filter((item)=>{  
-    if(searchField === item.name) return true;
-    return item.name
-  })
   
-
   return (
     <div className="ShoppingList">
       <ItemForm 
-      itemName={itemName}
-      onItemName={handleItemChange}
-      itemCategory={itemCategory}
-      onItemCategory={handleItemCategoryChange}
-      array={array}
-      onItemFormSubmit={handleFormSubmit} />
+        onItemFormSubmit={onItemFormSubmit} />
       <Filter 
-      onCategoryChange={handleCategoryChange} 
-      text={searchField} 
-      onSearchChange={handleSearchField} />
+        search={search} 
+        onCategoryChange={handleItemCategoryChange} 
+        onSearchChange={handleSearchChange} />
       <ul className="Items">
         {itemsToDisplay.map((item) => (
           <Item key={item.id} name={item.name} category={item.category} />
